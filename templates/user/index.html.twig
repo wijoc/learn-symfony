@@ -4,17 +4,59 @@
 
 {% block body %}
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    .example-wrapper {
+        margin: 1em auto;
+        max-width: 800px;
+        width: 95%;
+        font: 18px/1.5 sans-serif;
+    }
+
+    .example-wrapper code {
+        background: #F5F5F5;
+        padding: 2px 6px;
+    }
 </style>
 
 <div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <h1>Hello 'asdasdsad'! ✅</h1>
 
     This friendly message is coming from:
     <ul>
         <li>Your controller at <code>D:/JOE/htdocs/learn-symfony-one/src/Controller/UserController.php</code></li>
         <li>Your template at <code>D:/JOE/htdocs/learn-symfony-one/templates/user/index.html.twig</code></li>
     </ul>
+
+    <div>
+        <table style="width: 100%; table-layout: auto; border: solid 2px #d1d5db; border-collapse: collapse;">
+            <thead>
+                <th style="border: solid 2px #d1d5db; padding: .5rem 1rem .5rem 1rem; font-weight: bold;">Username</th>
+                <th style="border: solid 2px #d1d5db; padding: .5rem 1rem .5rem 1rem; font-weight: bold;">E-mail</th>
+                <th style="border: solid 2px #d1d5db; padding: .5rem 1rem .5rem 1rem; font-weight: bold;">Name</th>
+                <th style="border: solid 2px #d1d5db; padding: .5rem 1rem .5rem 1rem; font-weight: bold;">Action</th>
+            </thead>
+            <tbody>
+                {% if users is not empty %}
+                    {% for user in users %}
+                        <tr>
+                            <td style="border: solid 2px #d1d5db; padding: .5rem 1rem .5rem 1rem;">{{ user.username }}</td>
+                            <td style="border: solid 2px #d1d5db; padding: .5rem 1rem .5rem 1rem;">{{ user.email }}</td>
+                            <td style="border: solid 2px #d1d5db; padding: .5rem 1rem .5rem 1rem;">{{ user.firstName }} {{ user.lastName }}</td>
+                            <td style="display: flex; gap: .25rem; padding: .5rem 1rem .5rem 1rem;">
+                                <a style="display: inline-flex; align-items: center; border: solid 2px #fcd34d; color: #fcd34d; padding: 0.25rem .5rem 0.25rem .5rem;" href="{{ path('app_user_edit', {id: user.id}) }}">Edit</a>
+                                <form method="post" action="{{ path('app_user_delete', {id: user.id}) }}" onsubmit="return confirm('Are you sure?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                    <a style="display: inline-flex; align-items: center; cursor: pointer; border: solid 2px #dc2626; color: #dc2626; padding: 0.25rem .5rem 0.25rem .5rem;">Delete</a>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan=4>No user found!</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

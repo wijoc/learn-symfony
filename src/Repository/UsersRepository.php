@@ -4,12 +4,14 @@ namespace App\Repository;
 
 use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Users>
  */
-class UsersRepository extends ServiceEntityRepository
+// class UsersRepository extends ServiceEntityRepository
+class UsersRepository extends MyRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -40,4 +42,35 @@ class UsersRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function scopeSearch(QueryBuilder $query, array $filters): QueryBuilder
+    {
+        if (isset($filters['s']) && !empty($filters['s']) && $filters['s'] !== "") {
+            $query->andWhere(
+                $query->expr()->orX(
+                    $query->expr()->like('u.username', ':keyword'),
+                    $query->expr()->like('u.email', ':keyword'),
+                    $query->expr()->like('u.first_name', ':keyword'),
+                    $query->expr()->like('u.last_name', ':keyword'),
+                )
+            )->setParameter('keyword', '%' . $filters['s'] . '%');
+        }
+
+        return $query;
+    }
+
+    /**
+     * Get users on filters function
+     *
+     * @param array $filters
+     * @return array
+     */
+    public function getUsers(array $filters = []): array
+    {
+        $query = $this->createQueryBuilder('u');
+        $query = $this->search($query, $filters);
+
+        $results = $query->getQuery()->getResult();
+        return $results;
+    }
 }
